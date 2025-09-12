@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuthOrNull } from "@/lib/firebase";
 import {
   onAuthStateChanged,
   signOut,
