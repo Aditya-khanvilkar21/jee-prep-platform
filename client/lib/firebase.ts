@@ -1,17 +1,26 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp, getApps, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID as string,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
 };
 
-if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || !firebaseConfig.appId) {
-  // We avoid throwing to keep the app running; Auth UI will surface a helpful message.
-  // Missing config can be set via environment variables.
+function hasConfig(cfg: typeof firebaseConfig): cfg is Required<typeof firebaseConfig> {
+  return !!(cfg.apiKey && cfg.authDomain && cfg.projectId && cfg.appId);
 }
 
-export const app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+
+if (hasConfig(firebaseConfig)) {
+  app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
+  auth = getAuth(app);
+}
+
+export { app, auth };
+export function getFirebaseAuthOrNull() {
+  return auth;
+}
